@@ -1,0 +1,52 @@
++--------------------+----+
+|      Victim Descent|   #|
++--------------------+----+
+|Hispanic/Latin/Me...|1605|
+|               Black|1112|
+|               White|1052|
+|               Other| 510|
+|         Other Asian| 120|
+|              Korean|   9|
+|American Indian/A...|   3|
+|            Japanese|   3|
+|             Chinese|   2|
+|            Filipino|   2|
++--------------------+----+
+
+2 exec - 79s
+3 exec - 77s
+4 exec - 72s
+
+Explanation by chatgpt
+
+The observed change in execution time with different numbers of executors is likely due to the parallelism introduced by the number of executors, which can impact the overall performance of your Spark application. Here are some key factors to consider:
+
+Parallelism and Executors:
+
+Spark processes data in parallel across multiple executors. The number of executors determines the level of parallelism in your application.
+As you increase the number of executors, Spark can process tasks concurrently, potentially reducing the overall execution time.
+Task Distribution:
+
+When you have more executors, Spark can distribute tasks more evenly across the available resources.
+The tasks involve operations like filtering, joining, and aggregating data, and a balanced distribution of tasks can lead to better performance.
+Data Shuffling:
+
+Certain operations, such as joins or groupBy, involve shuffling data between partitions. The efficiency of data shuffling can be influenced by the number of executors.
+With more executors, Spark can perform data shuffling in a more distributed manner, leading to better performance.
+Resource Utilization:
+
+Increasing the number of executors allows Spark to better utilize available resources, including CPU and memory.
+This improved resource utilization can lead to faster task execution and reduced contention for resources.
+Configuration and Overhead:
+
+The configuration of your Spark application, cluster settings, and overhead associated with task scheduling can also impact performance.
+Consider adjusting other Spark configurations, such as spark.executor.memory, based on the available resources and the nature of your workload.
+Data Locality:
+
+The number of executors can affect data locality. Spark tries to schedule tasks on executors where the data resides to minimize data movement. More executors can provide more opportunities for data locality.
+To further optimize performance:
+
+Monitor the Spark UI to understand the resource utilization, task scheduling, and data shuffling patterns.
+Experiment with different executor configurations to find an optimal balance between parallelism and resource efficiency.
+Consider tuning other Spark configurations based on the characteristics of your workload.
+Remember that the optimal number of executors can depend on factors such as the size of your data, the complexity of your transformations, and the available cluster resources. It's often a matter of experimentation and tuning based on the specific characteristics of your Spark application and the underlying cluster.

@@ -1,0 +1,80 @@
+BROADCAST: 114s
+
+AREA - POLICE_DEP JOIN: BROADCAST
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- BroadcastHashJoin [AREA #21], [PREC#254], Inner, BuildRight, false
+   :- Union
+   :  :- Project [AREA #21, LAT#43, LON#44]
+   :  :  +- Filter (((isnotnull(LAT#43) AND NOT (LAT#43 = 0.0)) AND isnotnull(Weapon Used Cd#33)) AND isnotnull(AREA #21))
+   :  :     +- FileScan csv [AREA #21,Weapon Used Cd#33,LAT#43,LON#44] Batched: false, DataFilters: [isnotnull(LAT#43), NOT (LAT#43 = 0.0), isnotnull(Weapon Used Cd#33), isnotnull(AREA #21)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), Not(EqualTo(LAT,0.0)), IsNotNull(Weapon Used Cd), IsNotNull(AREA )], ReadSchema: struct<AREA :int,Weapon Used Cd:int,LAT:double,LON:double>
+   :  +- Project [AREA#94, LAT#116, LON#117]
+   :     +- Filter (((isnotnull(LAT#116) AND NOT (LAT#116 = 0.0)) AND isnotnull(Weapon Used Cd#106)) AND isnotnull(AREA#94))
+   :        +- FileScan csv [AREA#94,Weapon Used Cd#106,LAT#116,LON#117] Batched: false, DataFilters: [isnotnull(LAT#116), NOT (LAT#116 = 0.0), isnotnull(Weapon Used Cd#106), isnotnull(AREA#94)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), Not(EqualTo(LAT,0.0)), IsNotNull(Weapon Used Cd), IsNotNull(AREA)], ReadSchema: struct<AREA:int,Weapon Used Cd:int,LAT:double,LON:double>
+   +- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[3, int, true] as bigint)),false), [plan_id=89]
+      +- Project [DIVISION#252 AS division#269, X#249, Y#250, PREC#254]
+         +- Filter isnotnull(PREC#254)
+            +- FileScan csv [X#249,Y#250,DIVISION#252,PREC#254] Batched: false, DataFilters: [isnotnull(PREC#254)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/LAPD_Police_Stations.csv], PartitionFilters: [], PushedFilters: [IsNotNull(PREC)], ReadSchema: struct<X:double,Y:double,DIVISION:string,PREC:int>
+
+
+MERGE: 132s
+
+AREA - POLICE_DEP JOIN: MERGE
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- SortMergeJoin [AREA #21], [PREC#254], Inner
+   :- Sort [AREA #21 ASC NULLS FIRST], false, 0
+   :  +- Exchange hashpartitioning(AREA #21, 200), ENSURE_REQUIREMENTS, [plan_id=90]
+   :     +- Union
+   :        :- Project [AREA #21, LAT#43, LON#44]
+   :        :  +- Filter (((isnotnull(LAT#43) AND NOT (LAT#43 = 0.0)) AND isnotnull(Weapon Used Cd#33)) AND isnotnull(AREA #21))
+   :        :     +- FileScan csv [AREA #21,Weapon Used Cd#33,LAT#43,LON#44] Batched: false, DataFilters: [isnotnull(LAT#43), NOT (LAT#43 = 0.0), isnotnull(Weapon Used Cd#33), isnotnull(AREA #21)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), Not(EqualTo(LAT,0.0)), IsNotNull(Weapon Used Cd), IsNotNull(AREA )], ReadSchema: struct<AREA :int,Weapon Used Cd:int,LAT:double,LON:double>
+   :        +- Project [AREA#94, LAT#116, LON#117]
+   :           +- Filter (((isnotnull(LAT#116) AND NOT (LAT#116 = 0.0)) AND isnotnull(Weapon Used Cd#106)) AND isnotnull(AREA#94))
+   :              +- FileScan csv [AREA#94,Weapon Used Cd#106,LAT#116,LON#117] Batched: false, DataFilters: [isnotnull(LAT#116), NOT (LAT#116 = 0.0), isnotnull(Weapon Used Cd#106), isnotnull(AREA#94)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), Not(EqualTo(LAT,0.0)), IsNotNull(Weapon Used Cd), IsNotNull(AREA)], ReadSchema: struct<AREA:int,Weapon Used Cd:int,LAT:double,LON:double>
+   +- Sort [PREC#254 ASC NULLS FIRST], false, 0
+      +- Exchange hashpartitioning(PREC#254, 200), ENSURE_REQUIREMENTS, [plan_id=91]
+         +- Project [DIVISION#252 AS division#269, X#249, Y#250, PREC#254]
+            +- Filter isnotnull(PREC#254)
+               +- FileScan csv [X#249,Y#250,DIVISION#252,PREC#254] Batched: false, DataFilters: [isnotnull(PREC#254)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/LAPD_Police_Stations.csv], PartitionFilters: [], PushedFilters: [IsNotNull(PREC)], ReadSchema: struct<X:double,Y:double,DIVISION:string,PREC:int>
+
+
+SHUFFLE HASH: 132s
+
+AREA - POLICE_DEP JOIN: SHUFFLE HASH
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- ShuffledHashJoin [AREA #21], [PREC#254], Inner, BuildRight
+   :- Exchange hashpartitioning(AREA #21, 200), ENSURE_REQUIREMENTS, [plan_id=90]
+   :  +- Union
+   :     :- Project [AREA #21, LAT#43, LON#44]
+   :     :  +- Filter (((isnotnull(LAT#43) AND NOT (LAT#43 = 0.0)) AND isnotnull(Weapon Used Cd#33)) AND isnotnull(AREA #21))
+   :     :     +- FileScan csv [AREA #21,Weapon Used Cd#33,LAT#43,LON#44] Batched: false, DataFilters: [isnotnull(LAT#43), NOT (LAT#43 = 0.0), isnotnull(Weapon Used Cd#33), isnotnull(AREA #21)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), Not(EqualTo(LAT,0.0)), IsNotNull(Weapon Used Cd), IsNotNull(AREA )], ReadSchema: struct<AREA :int,Weapon Used Cd:int,LAT:double,LON:double>
+   :     +- Project [AREA#94, LAT#116, LON#117]
+   :        +- Filter (((isnotnull(LAT#116) AND NOT (LAT#116 = 0.0)) AND isnotnull(Weapon Used Cd#106)) AND isnotnull(AREA#94))
+   :           +- FileScan csv [AREA#94,Weapon Used Cd#106,LAT#116,LON#117] Batched: false, DataFilters: [isnotnull(LAT#116), NOT (LAT#116 = 0.0), isnotnull(Weapon Used Cd#106), isnotnull(AREA#94)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), Not(EqualTo(LAT,0.0)), IsNotNull(Weapon Used Cd), IsNotNull(AREA)], ReadSchema: struct<AREA:int,Weapon Used Cd:int,LAT:double,LON:double>
+   +- Exchange hashpartitioning(PREC#254, 200), ENSURE_REQUIREMENTS, [plan_id=91]
+      +- Project [DIVISION#252 AS division#269, X#249, Y#250, PREC#254]
+         +- Filter isnotnull(PREC#254)
+            +- FileScan csv [X#249,Y#250,DIVISION#252,PREC#254] Batched: false, DataFilters: [isnotnull(PREC#254)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/LAPD_Police_Stations.csv], PartitionFilters: [], PushedFilters: [IsNotNull(PREC)], ReadSchema: struct<X:double,Y:double,DIVISION:string,PREC:int>
+
+
+SHUFFLE REPLICATE: 114s
+
+AREA - POLICE_DEP JOIN: SHUFFLE REPLICATE 
+
+== Physical Plan ==
+CartesianProduct (AREA #21 = PREC#254)
+:- Union
+:  :- *(1) Project [AREA #21, LAT#43, LON#44]
+:  :  +- *(1) Filter (((isnotnull(LAT#43) AND NOT (LAT#43 = 0.0)) AND isnotnull(Weapon Used Cd#33)) AND isnotnull(AREA #21))
+:  :     +- FileScan csv [AREA #21,Weapon Used Cd#33,LAT#43,LON#44] Batched: false, DataFilters: [isnotnull(LAT#43), NOT (LAT#43 = 0.0), isnotnull(Weapon Used Cd#33), isnotnull(AREA #21)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), Not(EqualTo(LAT,0.0)), IsNotNull(Weapon Used Cd), IsNotNull(AREA )], ReadSchema: struct<AREA :int,Weapon Used Cd:int,LAT:double,LON:double>
+:  +- *(2) Project [AREA#94, LAT#116, LON#117]
+:     +- *(2) Filter (((isnotnull(LAT#116) AND NOT (LAT#116 = 0.0)) AND isnotnull(Weapon Used Cd#106)) AND isnotnull(AREA#94))
+:        +- FileScan csv [AREA#94,Weapon Used Cd#106,LAT#116,LON#117] Batched: false, DataFilters: [isnotnull(LAT#116), NOT (LAT#116 = 0.0), isnotnull(Weapon Used Cd#106), isnotnull(AREA#94)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [IsNotNull(LAT), Not(EqualTo(LAT,0.0)), IsNotNull(Weapon Used Cd), IsNotNull(AREA)], ReadSchema: struct<AREA:int,Weapon Used Cd:int,LAT:double,LON:double>
++- *(3) Project [DIVISION#252 AS division#269, X#249, Y#250, PREC#254]
+   +- *(3) Filter isnotnull(PREC#254)
+      +- FileScan csv [X#249,Y#250,DIVISION#252,PREC#254] Batched: false, DataFilters: [isnotnull(PREC#254)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/LAPD_Police_Stations.csv], PartitionFilters: [], PushedFilters: [IsNotNull(PREC)], ReadSchema: struct<X:double,Y:double,DIVISION:string,PREC:int>

@@ -1,0 +1,183 @@
+Query 3
+
+BROADCAST - 120s
+
+CRIME - ZIP JOIN: BROADCAST
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [Vict Descent#30, cast(substring(ZIPcode#274, 1, 5) as int) AS Zip code#377]
+   +- BroadcastHashJoin [knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44))], [knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273))], Inner, BuildRight, false
+      :- Union
+      :  :- Project [Vict Descent#30, LAT#43, LON#44]
+      :  :  +- Filter (((((year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#30 = X)) AND isnotnull(Vict Descent#30)) AND isnotnull(LAT#43)) AND isnotnull(LON#44))
+      :  :     +- FileScan csv [DATE OCC#19,Vict Descent#30,LAT#43,LON#44] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+      :  +- Project [Vict Descent#103, LAT#116, LON#117]
+      :     +- Filter (((((year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#103 = X)) AND isnotnull(Vict Descent#103)) AND isnotnull(LAT#116)) AND isnotnull(LON#117))
+      :        +- FileScan csv [DATE OCC#92,Vict Descent#103,LAT#116,LON#117] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+      +- BroadcastExchange HashedRelationBroadcastMode(List(knownfloatingpointnormalized(normalizenanandzero(input[0, double, false])), knownfloatingpointnormalized(normalizenanandzero(input[1, double, false]))),false), [plan_id=114]
+         +- Filter (isnotnull(LAT#272) AND isnotnull(LON#273))
+            +- FileScan csv [LAT#272,LON#273,ZIPcode#274] Batched: false, DataFilters: [isnotnull(LAT#272), isnotnull(LON#273)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/revgecoding.csv], PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<LAT:double,LON:double,ZIPcode:string>
+
+CRIME - INCOME JOIN: BROADCAST
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [Vict Descent#30, Estimated Median Income#251, pythonUDF0#435 AS Victim Descent#429]
+   +- BatchEvalPython [descent_description(Vict Descent#30)#428], [pythonUDF0#435]
+      +- Project [Vict Descent#30, Estimated Median Income#251]
+         +- BroadcastHashJoin [Zip code#377], [Zip Code#249], Inner, BuildRight, false
+            :- Project [Vict Descent#30, cast(substring(ZIPcode#274, 1, 5) as int) AS Zip code#377]
+            :  +- BroadcastHashJoin [knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44))], [knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273))], Inner, BuildRight, false
+            :     :- Union
+            :     :  :- Project [Vict Descent#30, LAT#43, LON#44]
+            :     :  :  +- Filter (((((year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#30 = X)) AND isnotnull(Vict Descent#30)) AND isnotnull(LAT#43)) AND isnotnull(LON#44))
+            :     :  :     +- FileScan csv [DATE OCC#19,Vict Descent#30,LAT#43,LON#44] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+            :     :  +- Project [Vict Descent#103, LAT#116, LON#117]
+            :     :     +- Filter (((((year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#103 = X)) AND isnotnull(Vict Descent#103)) AND isnotnull(LAT#116)) AND isnotnull(LON#117))
+            :     :        +- FileScan csv [DATE OCC#92,Vict Descent#103,LAT#116,LON#117] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+            :     +- BroadcastExchange HashedRelationBroadcastMode(List(knownfloatingpointnormalized(normalizenanandzero(input[0, double, false])), knownfloatingpointnormalized(normalizenanandzero(input[1, double, false]))),false), [plan_id=183]
+            :        +- Filter ((isnotnull(LAT#272) AND isnotnull(LON#273)) AND isnotnull(cast(substring(ZIPcode#274, 1, 5) as int)))
+            :           +- FileScan csv [LAT#272,LON#273,ZIPcode#274] Batched: false, DataFilters: [isnotnull(LAT#272), isnotnull(LON#273), isnotnull(cast(substring(ZIPcode#274, 1, 5) as int))], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/revgecoding.csv], PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<LAT:double,LON:double,ZIPcode:string>
+            +- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[0, int, false] as bigint)),false), [plan_id=187]
+               +- Filter isnotnull(Zip Code#249)
+                  +- FileScan csv [Zip Code#249,Estimated Median Income#251] Batched: false, DataFilters: [isnotnull(Zip Code#249)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/income/LA_income_2015.csv], PartitionFilters: [], PushedFilters: [IsNotNull(Zip Code)], ReadSchema: struct<Zip Code:int,Estimated Median Income:string>
+
+
+MERGE - 90s
+
+CRIME - ZIP JOIN: MERGE
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [Vict Descent#30, cast(substring(ZIPcode#274, 1, 5) as int) AS Zip code#377]
+   +- SortMergeJoin [knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44))], [knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273))], Inner
+      :- Sort [knownfloatingpointnormalized(normalizenanandzero(LAT#43)) ASC NULLS FIRST, knownfloatingpointnormalized(normalizenanandzero(LON#44)) ASC NULLS FIRST], false, 0
+      :  +- Exchange hashpartitioning(knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44)), 200), ENSURE_REQUIREMENTS, [plan_id=115]
+      :     +- Union
+      :        :- Project [Vict Descent#30, LAT#43, LON#44]
+      :        :  +- Filter (((((year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#30 = X)) AND isnotnull(Vict Descent#30)) AND isnotnull(LAT#43)) AND isnotnull(LON#44))
+      :        :     +- FileScan csv [DATE OCC#19,Vict Descent#30,LAT#43,LON#44] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+      :        +- Project [Vict Descent#103, LAT#116, LON#117]
+      :           +- Filter (((((year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#103 = X)) AND isnotnull(Vict Descent#103)) AND isnotnull(LAT#116)) AND isnotnull(LON#117))
+      :              +- FileScan csv [DATE OCC#92,Vict Descent#103,LAT#116,LON#117] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+      +- Sort [knownfloatingpointnormalized(normalizenanandzero(LAT#272)) ASC NULLS FIRST, knownfloatingpointnormalized(normalizenanandzero(LON#273)) ASC NULLS FIRST], false, 0
+         +- Exchange hashpartitioning(knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273)), 200), ENSURE_REQUIREMENTS, [plan_id=116]
+            +- Filter (isnotnull(LAT#272) AND isnotnull(LON#273))
+               +- FileScan csv [LAT#272,LON#273,ZIPcode#274] Batched: false, DataFilters: [isnotnull(LAT#272), isnotnull(LON#273)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/revgecoding.csv], PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<LAT:double,LON:double,ZIPcode:string>
+
+CRIME - INCOME JOIN: MERGE
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [Vict Descent#30, Estimated Median Income#251, pythonUDF0#435 AS Victim Descent#429]
+   +- BatchEvalPython [descent_description(Vict Descent#30)#428], [pythonUDF0#435]
+      +- Project [Vict Descent#30, Estimated Median Income#251]
+         +- SortMergeJoin [Zip code#377], [Zip Code#249], Inner
+            :- Sort [Zip code#377 ASC NULLS FIRST], false, 0
+            :  +- Exchange hashpartitioning(Zip code#377, 200), ENSURE_REQUIREMENTS, [plan_id=196]
+            :     +- Project [Vict Descent#30, cast(substring(ZIPcode#274, 1, 5) as int) AS Zip code#377]
+            :        +- SortMergeJoin [knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44))], [knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273))], Inner
+            :           :- Sort [knownfloatingpointnormalized(normalizenanandzero(LAT#43)) ASC NULLS FIRST, knownfloatingpointnormalized(normalizenanandzero(LON#44)) ASC NULLS FIRST], false, 0
+            :           :  +- Exchange hashpartitioning(knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44)), 200), ENSURE_REQUIREMENTS, [plan_id=188]
+            :           :     +- Union
+            :           :        :- Project [Vict Descent#30, LAT#43, LON#44]
+            :           :        :  +- Filter (((((year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#30 = X)) AND isnotnull(Vict Descent#30)) AND isnotnull(LAT#43)) AND isnotnull(LON#44))
+            :           :        :     +- FileScan csv [DATE OCC#19,Vict Descent#30,LAT#43,LON#44] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+            :           :        +- Project [Vict Descent#103, LAT#116, LON#117]
+            :           :           +- Filter (((((year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#103 = X)) AND isnotnull(Vict Descent#103)) AND isnotnull(LAT#116)) AND isnotnull(LON#117))
+            :           :              +- FileScan csv [DATE OCC#92,Vict Descent#103,LAT#116,LON#117] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+            :           +- Sort [knownfloatingpointnormalized(normalizenanandzero(LAT#272)) ASC NULLS FIRST, knownfloatingpointnormalized(normalizenanandzero(LON#273)) ASC NULLS FIRST], false, 0
+            :              +- Exchange hashpartitioning(knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273)), 200), ENSURE_REQUIREMENTS, [plan_id=189]
+            :                 +- Filter ((isnotnull(LAT#272) AND isnotnull(LON#273)) AND isnotnull(cast(substring(ZIPcode#274, 1, 5) as int)))
+            :                    +- FileScan csv [LAT#272,LON#273,ZIPcode#274] Batched: false, DataFilters: [isnotnull(LAT#272), isnotnull(LON#273), isnotnull(cast(substring(ZIPcode#274, 1, 5) as int))], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/revgecoding.csv], PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<LAT:double,LON:double,ZIPcode:string>
+            +- Sort [Zip Code#249 ASC NULLS FIRST], false, 0
+               +- Exchange hashpartitioning(Zip Code#249, 200), ENSURE_REQUIREMENTS, [plan_id=197]
+                  +- Filter isnotnull(Zip Code#249)
+                     +- FileScan csv [Zip Code#249,Estimated Median Income#251] Batched: false, DataFilters: [isnotnull(Zip Code#249)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/income/LA_income_2015.csv], PartitionFilters: [], PushedFilters: [IsNotNull(Zip Code)], ReadSchema: struct<Zip Code:int,Estimated Median Income:string>
+
+SHUFFLE HASH - 78s
+
+CRIME - ZIP JOIN: SHUFFLE HASH
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [Vict Descent#30, cast(substring(ZIPcode#274, 1, 5) as int) AS Zip code#377]
+   +- ShuffledHashJoin [knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44))], [knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273))], Inner, BuildRight
+      :- Exchange hashpartitioning(knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44)), 200), ENSURE_REQUIREMENTS, [plan_id=115]
+      :  +- Union
+      :     :- Project [Vict Descent#30, LAT#43, LON#44]
+      :     :  +- Filter (((((year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#30 = X)) AND isnotnull(Vict Descent#30)) AND isnotnull(LAT#43)) AND isnotnull(LON#44))
+      :     :     +- FileScan csv [DATE OCC#19,Vict Descent#30,LAT#43,LON#44] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+      :     +- Project [Vict Descent#103, LAT#116, LON#117]
+      :        +- Filter (((((year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#103 = X)) AND isnotnull(Vict Descent#103)) AND isnotnull(LAT#116)) AND isnotnull(LON#117))
+      :           +- FileScan csv [DATE OCC#92,Vict Descent#103,LAT#116,LON#117] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+      +- Exchange hashpartitioning(knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273)), 200), ENSURE_REQUIREMENTS, [plan_id=116]
+         +- Filter (isnotnull(LAT#272) AND isnotnull(LON#273))
+            +- FileScan csv [LAT#272,LON#273,ZIPcode#274] Batched: false, DataFilters: [isnotnull(LAT#272), isnotnull(LON#273)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/revgecoding.csv], PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<LAT:double,LON:double,ZIPcode:string>
+
+
+CRIME - INCOME JOIN: SHUFFLE HASH
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [Vict Descent#30, Estimated Median Income#251, pythonUDF0#435 AS Victim Descent#429]
+   +- BatchEvalPython [descent_description(Vict Descent#30)#428], [pythonUDF0#435]
+      +- Project [Vict Descent#30, Estimated Median Income#251]
+         +- ShuffledHashJoin [Zip code#377], [Zip Code#249], Inner, BuildRight
+            :- Exchange hashpartitioning(Zip code#377, 200), ENSURE_REQUIREMENTS, [plan_id=192]
+            :  +- Project [Vict Descent#30, cast(substring(ZIPcode#274, 1, 5) as int) AS Zip code#377]
+            :     +- ShuffledHashJoin [knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44))], [knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273))], Inner, BuildRight
+            :        :- Exchange hashpartitioning(knownfloatingpointnormalized(normalizenanandzero(LAT#43)), knownfloatingpointnormalized(normalizenanandzero(LON#44)), 200), ENSURE_REQUIREMENTS, [plan_id=186]
+            :        :  +- Union
+            :        :     :- Project [Vict Descent#30, LAT#43, LON#44]
+            :        :     :  +- Filter (((((year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#30 = X)) AND isnotnull(Vict Descent#30)) AND isnotnull(LAT#43)) AND isnotnull(LON#44))
+            :        :     :     +- FileScan csv [DATE OCC#19,Vict Descent#30,LAT#43,LON#44] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+            :        :     +- Project [Vict Descent#103, LAT#116, LON#117]
+            :        :        +- Filter (((((year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#103 = X)) AND isnotnull(Vict Descent#103)) AND isnotnull(LAT#116)) AND isnotnull(LON#117))
+            :        :           +- FileScan csv [DATE OCC#92,Vict Descent#103,LAT#116,LON#117] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+            :        +- Exchange hashpartitioning(knownfloatingpointnormalized(normalizenanandzero(LAT#272)), knownfloatingpointnormalized(normalizenanandzero(LON#273)), 200), ENSURE_REQUIREMENTS, [plan_id=187]
+            :           +- Filter ((isnotnull(LAT#272) AND isnotnull(LON#273)) AND isnotnull(cast(substring(ZIPcode#274, 1, 5) as int)))
+            :              +- FileScan csv [LAT#272,LON#273,ZIPcode#274] Batched: false, DataFilters: [isnotnull(LAT#272), isnotnull(LON#273), isnotnull(cast(substring(ZIPcode#274, 1, 5) as int))], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/revgecoding.csv], PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<LAT:double,LON:double,ZIPcode:string>
+            +- Exchange hashpartitioning(Zip Code#249, 200), ENSURE_REQUIREMENTS, [plan_id=193]
+               +- Filter isnotnull(Zip Code#249)
+                  +- FileScan csv [Zip Code#249,Estimated Median Income#251] Batched: false, DataFilters: [isnotnull(Zip Code#249)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/income/LA_income_2015.csv], PartitionFilters: [], PushedFilters: [IsNotNull(Zip Code)], ReadSchema: struct<Zip Code:int,Estimated Median Income:string>
+
+SHUFFLE REPLICATE NL - 
+
+CRIME - ZIP JOIN: SHUFFLE REPLICATE NL
+
+== Physical Plan ==
+*(4) Project [Vict Descent#30, cast(substring(ZIPcode#274, 1, 5) as int) AS Zip code#377]
++- CartesianProduct ((knownfloatingpointnormalized(normalizenanandzero(LAT#43)) = knownfloatingpointnormalized(normalizenanandzero(LAT#272))) AND (knownfloatingpointnormalized(normalizenanandzero(LON#44)) = knownfloatingpointnormalized(normalizenanandzero(LON#273))))
+   :- Union
+   :  :- *(1) Project [Vict Descent#30, LAT#43, LON#44]
+   :  :  +- *(1) Filter (((((year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#30 = X)) AND isnotnull(Vict Descent#30)) AND isnotnull(LAT#43)) AND isnotnull(LON#44))
+   :  :     +- FileScan csv [DATE OCC#19,Vict Descent#30,LAT#43,LON#44] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+   :  +- *(2) Project [Vict Descent#103, LAT#116, LON#117]
+   :     +- *(2) Filter (((((year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#103 = X)) AND isnotnull(Vict Descent#103)) AND isnotnull(LAT#116)) AND isnotnull(LON#117))
+   :        +- FileScan csv [DATE OCC#92,Vict Descent#103,LAT#116,LON#117] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+   +- *(3) Filter (isnotnull(LAT#272) AND isnotnull(LON#273))
+      +- FileScan csv [LAT#272,LON#273,ZIPcode#274] Batched: false, DataFilters: [isnotnull(LAT#272), isnotnull(LON#273)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/revgecoding.csv], PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<LAT:double,LON:double,ZIPcode:string>
+
+CRIME - INCOME JOIN: SHUFFLE REPLICATE NL
+
+== Physical Plan ==
+*(7) Project [Vict Descent#30, Estimated Median Income#251, pythonUDF0#435 AS Victim Descent#429]
++- BatchEvalPython [descent_description(Vict Descent#30)#428], [pythonUDF0#435]
+   +- *(6) Project [Vict Descent#30, Estimated Median Income#251]
+      +- CartesianProduct (Zip Code#249 = Zip code#377)
+         :- *(4) Project [Vict Descent#30, cast(substring(ZIPcode#274, 1, 5) as int) AS Zip code#377]
+         :  +- CartesianProduct ((knownfloatingpointnormalized(normalizenanandzero(LAT#43)) = knownfloatingpointnormalized(normalizenanandzero(LAT#272))) AND (knownfloatingpointnormalized(normalizenanandzero(LON#44)) = knownfloatingpointnormalized(normalizenanandzero(LON#273))))
+         :     :- Union
+         :     :  :- *(1) Project [Vict Descent#30, LAT#43, LON#44]
+         :     :  :  +- *(1) Filter (((((year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#30 = X)) AND isnotnull(Vict Descent#30)) AND isnotnull(LAT#43)) AND isnotnull(LON#44))
+         :     :  :     +- FileScan csv [DATE OCC#19,Vict Descent#30,LAT#43,LON#44] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+         :     :  +- *(2) Project [Vict Descent#103, LAT#116, LON#117]
+         :     :     +- *(2) Filter (((((year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), false) as date)) = 2015) AND NOT (Vict Descent#103 = X)) AND isnotnull(Vict Descent#103)) AND isnotnull(LAT#116)) AND isnotnull(LON#117))
+         :     :        +- FileScan csv [DATE OCC#92,Vict Descent#103,LAT#116,LON#117] Batched: false, DataFilters: [(year(cast(gettimestamp(DATE OCC#92, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Europe/Athens), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present..., PartitionFilters: [], PushedFilters: [Not(EqualTo(Vict Descent,X)), IsNotNull(Vict Descent), IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<DATE OCC:string,Vict Descent:string,LAT:double,LON:double>
+         :     +- *(3) Filter ((isnotnull(LAT#272) AND isnotnull(LON#273)) AND isnotnull(cast(substring(ZIPcode#274, 1, 5) as int)))
+         :        +- FileScan csv [LAT#272,LON#273,ZIPcode#274] Batched: false, DataFilters: [isnotnull(LAT#272), isnotnull(LON#273), isnotnull(cast(substring(ZIPcode#274, 1, 5) as int))], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/revgecoding.csv], PartitionFilters: [], PushedFilters: [IsNotNull(LAT), IsNotNull(LON)], ReadSchema: struct<LAT:double,LON:double,ZIPcode:string>
+         +- *(5) Filter isnotnull(Zip Code#249)
+            +- FileScan csv [Zip Code#249,Estimated Median Income#251] Batched: false, DataFilters: [isnotnull(Zip Code#249)], Format: CSV, Location: InMemoryFileIndex(1 paths)[hdfs://okeanos-master:54310/user/input/income/LA_income_2015.csv], PartitionFilters: [], PushedFilters: [IsNotNull(Zip Code)], ReadSchema: struct<Zip Code:int,Estimated Median Income:string>
+

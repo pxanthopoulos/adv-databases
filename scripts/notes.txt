@@ -1,0 +1,47 @@
+~~~ama den anoigei to dfs
+
+rm -rf ~/opt/data/hdfs/*
+rm -rf ~/opt/data/hadoop/*
+
+~~~from master, start everything
+
+$HADOOP_HOME/bin/hdfs namenode -format
+start-dfs.sh
+start-yarn.sh
+$SPARK_HOME/sbin/start-history-server.sh
+
+~~~download data to ~/data
+
+~~~copy data to DFS & create event log
+
+hdfs dfs -mkdir /spark.eventLog
+hdfs dfs -mkdir /user/input
+hdfs dfs -copyFromLocal ~/data/Crime_Data_from_2010_to_2019_20231224.csv /user/input/
+hdfs dfs -copyFromLocal ~/data/Crime_Data_from_2020_to_Present_20231224.csv /user/input/
+hdfs dfs -copyFromLocal ~/data/income /user/input/
+hdfs dfs -copyFromLocal ~/data/revgecoding.csv /user/input/
+hdfs dfs -copyFromLocal ~/data/LAPD_Police_Stations.csv /user/input/
+
+~~~download scripts to ~/scripts
+
+~~~download geodesic files to ~/scripts
+wget from our github...
+
+~~~execute scripts
+
+spark-submit ~/scripts/part2.py
+spark-submit --num-executors 4 ~/scripts/part3-df.py
+spark-submit --num-executors 4 ~/scripts/part3-sql.py
+
+spark-submit --num-executors 4 ~/scripts/part4-df.py
+spark-submit --num-executors 4 ~/scripts/part4-rdd.py
+
+spark-submit --num-executors 2 ~/scripts/part5-df.py
+spark-submit --num-executors 3 ~/scripts/part5-df.py
+spark-submit --num-executors 4 ~/scripts/part5-df.py
+
+spark-submit --num-executors 4 ~/scripts/part6-1a-df.py
+spark-submit --num-executors 4 ~/scripts/part6-1b-df.py
+spark-submit --num-executors 4 ~/scripts/part6-2a-df.py
+spark-submit --num-executors 4 ~/scripts/part6-2b-df.py
+
