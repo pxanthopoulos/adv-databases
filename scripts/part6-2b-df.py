@@ -32,7 +32,6 @@ dataset_filt_df = (
     .filter(F.col("LAT") != 0.0)
     .filter(F.col("Weapon Used Cd").isNotNull())
     .select(["DR_NO", "LAT", "LON"])
-    .collect()
 )
 
 policedept_filt_df = (
@@ -46,40 +45,32 @@ def dist(x1, y1, x2, y2):
 
 dist_udf = F.udf(dist, FloatType())
 
-schema = StructType([
-    StructField("division", StringType(), True),
-    StructField("Distance", FloatType(), True)
-])
+divisions = [row.division for row in policedept_filt_df.select("division").distinct().collect()]
+division_data = policedept_filt_df.filter(F.col("division") == divisions[0])
+joined_df = dataset_filt_df.crossJoin(division_data)
+dataset_filt_df = joined_df.withColumn("Distance", dist_udf(F.col("Y"), F.col("X"), F.col("LAT"), F.col("LON")))
+dataset_filt_df = dataset_filt_df.drop("X", "Y")
+dataset_filt_df = dataset_filt_df.withColumnRenamed("division", "closest_division")
 
-mindist_df = spark.createDataFrame([], schema=schema)
-
-loopCount = len(dataset_filt_df)
-for i in range(loopCount):
-    crime_row = dataset_filt_df[i]
-    crime_df = spark.createDataFrame([crime_row])
-    joined_df = policedept_filt_df.crossJoin(crime_df)
-    dist_df = joined_df.withColumn("Distance", dist_udf(F.col("Y"), F.col("X"), F.col("LAT"), F.col("LON"))).collect()
-
-    minDist = 100   # large enough value
-    closestDept = ""
-    for j in range(joined_df.count()):
-        currDist = dist_df[j]["Distance"]
-        if currDist < minDist:
-            minDist = currDist
-            closestDept = dist_df[j]["division"]
-
-    new_row = Row(division=closestDept, Distance=minDist)
-    mindist_df = mindist_df.union(spark.createDataFrame([new_row]))
+# Iterate through each division
+for division in divisions[1:]:
+    division_data = policedept_filt_df.filter(F.col("division") == division)
+    joined_df = dataset_filt_df.crossJoin(division_data)
+    joined_df = joined_df.withColumn("New_Distance", dist_udf(F.col("Y"), F.col("X"), F.col("LAT"), F.col("LON")))
+    joined_df = joined_df.withColumn("Distance", F.least(F.col("Distance"), F.col("New_Distance")))
+    joined_df = joined_df.withColumn("distance_equal", F.col("Distance") == F.col("New_Distance"))
+    joined_df = joined_df.withColumn("closest_division", F.when(F.col("distance_equal"), F.col("division")).otherwise(F.col("closest_division")))
+    dataset_filt_df = joined_df.drop("New_Distance", "distance_equal", "X", "Y", "division")
 
 final_df = (
-    mindist_df
-    .groupBy("division")
+    dataset_filt_df
+    .groupBy("closest_division")
     .agg(F.avg("Distance").alias("average_distance"), 
-         F.count("division").alias("#")
+        F.count("closest_division").alias("#")
     )
     .orderBy(F.col("#").desc())
 )
 
-final_df.show()
+final_df.show(21)
 
 spark.stop()
