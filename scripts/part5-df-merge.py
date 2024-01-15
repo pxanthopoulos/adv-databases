@@ -4,21 +4,28 @@ from pyspark.sql.types import StringType, IntegerType
 
 spark = SparkSession.builder.appName("part5-df-merge").getOrCreate()
 
-first_dataset = spark.read.csv("hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20231224.csv", header=True, inferSchema=True)
-second_dataset = spark.read.csv("hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present_20231224.csv", header=True, inferSchema=True)
+first_dataset = spark.read.csv(
+    "hdfs://okeanos-master:54310/user/input/Crime_Data_from_2010_to_2019_20231224.csv", header=True, inferSchema=True)
+second_dataset = spark.read.csv(
+    "hdfs://okeanos-master:54310/user/input/Crime_Data_from_2020_to_Present_20231224.csv", header=True, inferSchema=True)
 
 dataset_df = first_dataset.union(second_dataset)
 
-dataset_df = dataset_df.withColumn("Date Rptd", F.to_timestamp("Date Rptd", "MM/dd/yyyy hh:mm:ss a").cast("date"))
-dataset_df = dataset_df.withColumn("DATE OCC", F.to_timestamp("DATE OCC", "MM/dd/yyyy hh:mm:ss a").cast("date"))
+dataset_df = dataset_df.withColumn("Date Rptd", F.to_timestamp(
+    "Date Rptd", "MM/dd/yyyy hh:mm:ss a").cast("date"))
+dataset_df = dataset_df.withColumn("DATE OCC", F.to_timestamp(
+    "DATE OCC", "MM/dd/yyyy hh:mm:ss a").cast("date"))
 
-income2015_df = spark.read.csv("hdfs://okeanos-master:54310/user/input/income/LA_income_2015.csv", header=True, inferSchema=True)
-revgeocoding_df = spark.read.csv("hdfs://okeanos-master:54310/user/input/revgecoding.csv", header=True, inferSchema=True)
+income2015_df = spark.read.csv(
+    "hdfs://okeanos-master:54310/user/input/income/LA_income_2015.csv", header=True, inferSchema=True)
+revgeocoding_df = spark.read.csv(
+    "hdfs://okeanos-master:54310/user/input/revgecoding.csv", header=True, inferSchema=True)
 
 dataset_filt_df = (
     dataset_df
     .select(["DATE OCC", "Vict Descent", "LAT", "LON"])
 )
+
 
 def descent_description(descent):
     if descent == "A":
@@ -58,10 +65,13 @@ def descent_description(descent):
     if descent == "Z":
         return "Asian Indian"
 
+
 descript_udf = F.udf(descent_description, StringType())
+
 
 def get_income(string_income):
     return int(string_income[1:].replace(",", ""))
+
 
 get_income_udf = F.udf(get_income, IntegerType())
 
