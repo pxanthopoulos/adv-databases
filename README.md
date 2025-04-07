@@ -7,4 +7,4 @@ The report of this project is in the file [adv_db_report.pdf](adv_db_report.pdf)
 
 In the directory [data](./data), you can find the datasets used for the projct.
 In the directory [scripts](./scripts), you can find the spark scripts for each query.
-In the directory [join-plans](./join-plans), you can find the logical plans (graph & text format) of the joins in queries 3 & 4, for the different join strategies used.
+<!-- In the directory [join-plans](./join-plans), you can find the logical plans (graph & text format) of the joins in queries 3 & 4, for the different join strategies used. -->
